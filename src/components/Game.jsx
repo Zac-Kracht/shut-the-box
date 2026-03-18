@@ -36,27 +36,26 @@ function Game({count, onExitButtonClick}) {
     }
 
     // Event handlers
-    function onRollClick() {
-        setGameState("play");
+    function onRollClick(event) {
+        const buttonName = event.currentTarget.name;
 
         let rolls = 0;
         const interval = setInterval(() => {
             const dice1 = Math.floor(Math.random() * 6) + 1;
             const dice2 = Math.floor(Math.random() * 6) + 1;
 
-            setDiceRoll([dice1, dice2]);
+            setDiceRoll(buttonName == "rollTwo" ? [dice1, dice2] : [dice1]);
 
             rolls++;
             if (rolls >= numRollsPerAnimation) {
                 clearInterval(interval);
                 setShowTotal(true);
-                console.log(`Rolled ${diceRoll[0] + diceRoll[1]}`);
+                setGameState("play");
             }
         }, rollDelay);
     }
 
     function onSubmit(formData) {
-        // event.preventDefault();
         const checkedTiles = formData.getAll('tile');
 
         if (isSumValid(checkedTiles)) {
@@ -65,33 +64,55 @@ function Game({count, onExitButtonClick}) {
                     return checkedTiles.includes((i+1).toString()) ? false : enabled;
                 });
             });
-            setGameState("roll");
             setShowTotal(false);
+            setGameState("roll");
 
-            console.log(`Submitted valid sum [${checkedTiles}]. GameOver=${allTilesDown()}`);
+            console.log(`Submitted valid sum [${checkedTiles}]`);
         } else {
-            console.log(`Submitted invalid sum [${checkedTiles}]`)
+            console.log(`Submitted invalid sum [${checkedTiles}]`);
         }
     }
 
     // Helper functions
     function isSumValid(checkedTiles) {
-        const sum = checkedTiles.reduce(
+        const sumCheckedTiles = checkedTiles.reduce(
             (sum, val) => sum + parseInt(val, 10)
         , 0);
-        return sum === (diceRoll[0] + diceRoll[1]) ? true : false;
+        const sumDiceRoll = diceRoll.reduce((sum, val) => sum + val, 0);
+        return sumCheckedTiles === sumDiceRoll ? true : false;
     }
 
-    function allTilesDown() {
-        return tileEnabled.reduce((sum, val) => sum && !val, true)
+    function allTilesDown(arr) {
+        return arr.reduce((sum, val) => sum && !val, true);
+    }
+
+    function isPlayPossible() {
+        const availableTiles = tileEnabled
+        .map((tile, i) => tile ? (i+1).toString() : -1)
+        .filter(i => i !== -1);
+        console.log(availableTiles);
+        return true;
+    }
+
+    function isOneDiceRollAvail() {
+        return allTilesDown(tileEnabled.slice(6));
+    }
+
+    function sumDiceRoll(diceArr) {
+        return diceArr.reduce((sum, val) => sum + val, 0);
     }
 
     // Final component
     return (
       <div className="flex justify-center">
         <FontAwesomeIcon icon={diceMap[diceRoll[0]]} size="2xl" />
-        <FontAwesomeIcon icon={diceMap[diceRoll[1]]} size="2xl" />
-        <button className={buttonClass} onClick={onRollClick} disabled={gameState == "roll" ? false : true}>
+        {diceRoll.length == 2 && <FontAwesomeIcon icon={diceMap[diceRoll[1]]} size="2xl" />}
+        {isOneDiceRollAvail() &&
+            <button name="rollOne" className={buttonClass} onClick={onRollClick} disabled={gameState == "roll" ? false : true}>
+                Roll 1 die
+            </button>
+        }
+        <button name="rollTwo" className={buttonClass} onClick={onRollClick} disabled={gameState == "roll" ? false : true}>
             Roll 2 dice
         </button>
         <button className={buttonClass}>
@@ -100,7 +121,7 @@ function Game({count, onExitButtonClick}) {
         <button className={buttonClass} onClick={onExitButtonClick}>
             Exit
         </button>
-        {showTotal && <p>Total: {diceRoll[0] + diceRoll[1]}</p>}
+        {showTotal && <p>Total: {sumDiceRoll(diceRoll)}</p>}
         <form action={onSubmit} >
             {checkBoxes}
             <input type="submit" className={buttonClass} disabled={gameState == "play" ? false : true} />
