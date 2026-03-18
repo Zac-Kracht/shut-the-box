@@ -9,12 +9,7 @@ function Game({count, onExitButtonClick}) {
     const [ diceRoll, setDiceRoll ] = useState([1, 1]);
     const [ gameState, setGameState ] = useState("roll");
     const [ showTotal, setShowTotal ] = useState(false);
-    const [ tileStates, setTileStates ] = useState(
-        Array(count).fill({
-            "enabled": true,
-            "checked": false
-        })
-    );
+    const [ tileEnabled, setTileEnabled ] = useState(Array(count).fill(true));
 
     // Render constants
     const numRollsPerAnimation = 6;
@@ -32,11 +27,9 @@ function Game({count, onExitButtonClick}) {
     // Render variables
     let checkBoxes = []
     for (let i = 1; i <= count; i++) {
-        const isDisabled = !tileStates[i-1].enabled;
-        const isChecked = tileStates[i-1].checked;
         checkBoxes.push(
             <label key={i.toString()}>
-                <input type="checkbox" name="tile" value={i} disabled={isDisabled} checked={isChecked} onChange={onCheckBoxChange} />
+                <input type="checkbox" name="tile" value={i} disabled={!tileEnabled[i-1]} />
                 {i}
             </label>
         );
@@ -57,52 +50,40 @@ function Game({count, onExitButtonClick}) {
             if (rolls >= numRollsPerAnimation) {
                 clearInterval(interval);
                 setShowTotal(true);
+                console.log(`Rolled ${diceRoll[0] + diceRoll[1]}`);
             }
         }, rollDelay);
     }
 
-    function onSubmit(event) {
-        event.preventDefault();
+    function onSubmit(formData) {
+        // event.preventDefault();
+        const checkedTiles = formData.getAll('tile');
 
-        // const data = new FormData(event.currentTarget);
-        // const selectedTiles = data.getAll("tile");
-
-        setTileStates(prevTileStates => {
-            return prevTileStates.map(tile => {
-                return {
-                    "enabled": tile.checked ? false : tile.enabled,
-                    "checked": false
-                }
+        if (isSumValid(checkedTiles)) {
+            setTileEnabled(prevTileEnabled => {
+                return prevTileEnabled.map((enabled, i) => {
+                    return checkedTiles.includes((i+1).toString()) ? false : enabled;
+                });
             });
-        });
-        setGameState("roll");
-        setShowTotal(false);
-    }
+            setGameState("roll");
+            setShowTotal(false);
 
-    function onCheckBoxChange(event) {
-        const {name, checked, value} = event.target;
-
-        // change title state of current event tile to checked or unchecked
-        setTileStates(prevTileStates => {
-            return prevTileStates.map((tile, i) => {
-                if (i === parseInt(value, 10) - 1) {
-                    return {
-                        ...tile,
-                        "checked": checked ? true : false
-                    }
-                } else {
-                    return {...tile}
-                }
-            });
-        });
+            console.log(`Submitted valid sum [${checkedTiles}]. GameOver=${allTilesDown()}`);
+        } else {
+            console.log(`Submitted invalid sum [${checkedTiles}]`)
+        }
     }
 
     // Helper functions
-    function isSumValid() {
-        const sum = tileStates.reduce(
-            (sum, val, i) => sum + (val.checked ? i+1 : 0)
+    function isSumValid(checkedTiles) {
+        const sum = checkedTiles.reduce(
+            (sum, val) => sum + parseInt(val, 10)
         , 0);
         return sum === (diceRoll[0] + diceRoll[1]) ? true : false;
+    }
+
+    function allTilesDown() {
+        return tileEnabled.reduce((sum, val) => sum && !val, true)
     }
 
     // Final component
@@ -120,9 +101,9 @@ function Game({count, onExitButtonClick}) {
             Exit
         </button>
         {showTotal && <p>Total: {diceRoll[0] + diceRoll[1]}</p>}
-        <form onSubmit={onSubmit} >
+        <form action={onSubmit} >
             {checkBoxes}
-            <input type="submit" className={buttonClass} disabled={gameState == "play" && isSumValid() ? false : true} />
+            <input type="submit" className={buttonClass} disabled={gameState == "play" ? false : true} />
         </form>
       </div>
     )
