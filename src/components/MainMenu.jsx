@@ -12,9 +12,6 @@ function MainMenu({onClickPlayButtons}) {
             <button className={buttonClass} name="play12" onClick={onClickPlayButtons}>
                 Play 12 tile
             </button>
-            <button className={buttonClass}>
-                Instructions
-            </button>
         </div>
       </div>
     )
