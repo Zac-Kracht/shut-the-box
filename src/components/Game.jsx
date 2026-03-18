@@ -32,11 +32,11 @@ function Game({count, onExitButtonClick}) {
     // Render variables
     let checkBoxes = []
     for (let i = 1; i <= count; i++) {
-        const isDisabled = gameState != "play" || !tileStates[i-1].enabled;
-        const isChecked = tileStates[i-1].checked
+        const isDisabled = !tileStates[i-1].enabled;
+        const isChecked = tileStates[i-1].checked;
         checkBoxes.push(
             <label key={i.toString()}>
-                <input type="checkbox" name="tile" value={i} disabled={isDisabled} checked={isChecked} />
+                <input type="checkbox" name="tile" value={i} disabled={isDisabled} checked={isChecked} onChange={onCheckBoxChange} />
                 {i}
             </label>
         );
@@ -64,35 +64,37 @@ function Game({count, onExitButtonClick}) {
     function onSubmit(event) {
         event.preventDefault();
 
-        const data = new FormData(event.currentTarget);
-        const selectedTiles = data.getAll("tile");
+        // const data = new FormData(event.currentTarget);
+        // const selectedTiles = data.getAll("tile");
 
-        // TODO: where put these
+        setTileStates(prevTileStates => {
+            return prevTileStates.map(tile => {
+                return {
+                    "enabled": tile.checked ? false : tile.enabled,
+                    "checked": false
+                }
+            });
+        });
         setGameState("roll");
         setShowTotal(false);
     }
 
     function onCheckBoxChange(event) {
-        if (event.target.type === "checkbox") {
-            const {name, checked, value} = event.target;
+        const {name, checked, value} = event.target;
 
-            const data = new FormData(event.currentTarget);
-            const selectedTiles = data.getAll("tile");
-
-            // change title state of current event tile to checked or unchecked
-            setTileStates(prevTileStates => {
-                return prevTileStates.map((tile, i) => {
-                    if (i === parseInt(value, 10) - 1) {
-                        return {
-                            ...tile,
-                            "checked": checked ? true : false
-                        }
-                    } else {
-                        return {...tile}
+        // change title state of current event tile to checked or unchecked
+        setTileStates(prevTileStates => {
+            return prevTileStates.map((tile, i) => {
+                if (i === parseInt(value, 10) - 1) {
+                    return {
+                        ...tile,
+                        "checked": checked ? true : false
                     }
-                });
+                } else {
+                    return {...tile}
+                }
             });
-        }
+        });
     }
 
     // Helper functions
@@ -118,7 +120,7 @@ function Game({count, onExitButtonClick}) {
             Exit
         </button>
         {showTotal && <p>Total: {diceRoll[0] + diceRoll[1]}</p>}
-        <form onSubmit={onSubmit} onChange={onCheckBoxChange}>
+        <form onSubmit={onSubmit} >
             {checkBoxes}
             <input type="submit" className={buttonClass} disabled={gameState == "play" && isSumValid() ? false : true} />
         </form>
