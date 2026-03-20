@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix } from '@fortawesome/free-solid-svg-icons'
+
+import * as GameUtils from '../utils/utils.js'
+import * as GameConstants from '../utils/constants.js'
 
 
 function Game({count, onExitButtonClick}) {
@@ -11,17 +13,6 @@ function Game({count, onExitButtonClick}) {
     const [ showTotal, setShowTotal ] = useState(false);
     const [ tileEnabled, setTileEnabled ] = useState(Array(count).fill(true));
 
-    // Render constants
-    const numRollsPerAnimation = 6;
-    const rollDelay = 100;
-    const diceMap = {
-        1: faDiceOne,
-        2: faDiceTwo,
-        3: faDiceThree,
-        4: faDiceFour,
-        5: faDiceFive,
-        6: faDiceSix,
-    };
     const buttonClass = "w-32 border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700";
 
     // Render variables
@@ -44,70 +35,41 @@ function Game({count, onExitButtonClick}) {
             const dice1 = Math.floor(Math.random() * 6) + 1;
             const dice2 = Math.floor(Math.random() * 6) + 1;
 
-            setDiceRoll(buttonName == "rollTwo" ? [dice1, dice2] : [dice1]);
+            const nextDiceRoll = buttonName == "rollTwo" ? [dice1, dice2] : [dice1]
+            setDiceRoll(nextDiceRoll);
 
             rolls++;
-            if (rolls >= numRollsPerAnimation) {
+            if (rolls >= GameConstants.NUM_ROLLS_PER_ANIMATION) {
                 clearInterval(interval);
                 setShowTotal(true);
-                setGameState("play");
+                setGameState(GameUtils.isPlayPossible(tileEnabled, nextDiceRoll) ? "play" : "game-over");
             }
-        }, rollDelay);
+        }, GameConstants.ROLL_ANIMATON_DELAY);
     }
 
     function onSubmit(formData) {
         const checkedTiles = formData.getAll('tile');
 
-        if (isSumValid(checkedTiles)) {
-            setTileEnabled(prevTileEnabled => {
-                return prevTileEnabled.map((enabled, i) => {
-                    return checkedTiles.includes((i+1).toString()) ? false : enabled;
-                });
+        if (GameUtils.isSumValid(checkedTiles, diceRoll)) {
+            const nextTileEnabled = tileEnabled.map((enabled, i) => {
+                return checkedTiles.includes((i+1).toString()) ? false : enabled;
             });
+            setTileEnabled(nextTileEnabled);
             setShowTotal(false);
-            setGameState("roll");
+            setGameState(GameUtils.allTilesDown(nextTileEnabled) ? "game-over" : "roll");
 
             console.log(`Submitted valid sum [${checkedTiles}]`);
         } else {
             console.log(`Submitted invalid sum [${checkedTiles}]`);
         }
-    }
-
-    // Helper functions
-    function isSumValid(checkedTiles) {
-        const sumCheckedTiles = checkedTiles.reduce(
-            (sum, val) => sum + parseInt(val, 10)
-        , 0);
-        const sumDiceRoll = diceRoll.reduce((sum, val) => sum + val, 0);
-        return sumCheckedTiles === sumDiceRoll ? true : false;
-    }
-
-    function allTilesDown(arr) {
-        return arr.reduce((sum, val) => sum && !val, true);
-    }
-
-    function isPlayPossible() {
-        const availableTiles = tileEnabled
-        .map((tile, i) => tile ? (i+1).toString() : -1)
-        .filter(i => i !== -1);
-        console.log(availableTiles);
-        return true;
-    }
-
-    function isOneDiceRollAvail() {
-        return allTilesDown(tileEnabled.slice(6));
-    }
-
-    function sumDiceRoll(diceArr) {
-        return diceArr.reduce((sum, val) => sum + val, 0);
-    }
+    }    
 
     // Final component
     return (
       <div className="flex justify-center">
-        <FontAwesomeIcon icon={diceMap[diceRoll[0]]} size="2xl" />
-        {diceRoll.length == 2 && <FontAwesomeIcon icon={diceMap[diceRoll[1]]} size="2xl" />}
-        {isOneDiceRollAvail() &&
+        <FontAwesomeIcon icon={GameConstants.DICE_TO_COMP_MAP[diceRoll[0]]} size="2xl" />
+        {diceRoll.length == 2 && <FontAwesomeIcon icon={GameConstants.DICE_TO_COMP_MAP[diceRoll[1]]} size="2xl" />}
+        {GameUtils.isOneDiceRollAvail(tileEnabled) &&
             <button name="rollOne" className={buttonClass} onClick={onRollClick} disabled={gameState == "roll" ? false : true}>
                 Roll 1 die
             </button>
@@ -121,11 +83,12 @@ function Game({count, onExitButtonClick}) {
         <button className={buttonClass} onClick={onExitButtonClick}>
             Exit
         </button>
-        {showTotal && <p>Total: {sumDiceRoll(diceRoll)}</p>}
+        {showTotal && <p>Total: {GameUtils.sumDiceRoll(diceRoll)}</p>}
         <form action={onSubmit} >
             {checkBoxes}
             <input type="submit" className={buttonClass} disabled={gameState == "play" ? false : true} />
         </form>
+        {gameState == "game-over" && <p className="text-red-600">Game Over!</p>}
       </div>
     )
 }
