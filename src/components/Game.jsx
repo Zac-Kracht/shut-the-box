@@ -57,11 +57,7 @@ function Game({count, onExitButtonClick}) {
             setTileEnabled(nextTileEnabled);
             setShowTotal(false);
             setGameState(GameUtils.allTilesDown(nextTileEnabled) ? "game-over" : "roll");
-
-            console.log(`Submitted valid sum [${checkedTiles}]`);
-        } else {
-            console.log(`Submitted invalid sum [${checkedTiles}]`);
-        }
+        } 
     }    
 
     // Final component

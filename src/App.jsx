@@ -24,11 +24,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-cover bg-center bg-no-repeat bg-[url('/wood-pattern2.png')]">
-      <main className="bg-green-700 fixed top-10 left-10 right-10 bottom-40 rounded-xl p-5">
-        {screen === "main-menu" && <MainMenu onClickPlayButtons={onClickPlayButtons} />}
-        {screen === "game" && <Game count={tiles} onExitButtonClick={onExitButtonClick} />}
-      </main>
+    <div className="flex min-h-screen w-full bg-wood p-10 pb-20">
+      <div className="flex-1 rounded-2xl overflow-hidden border-5 border-[#2d1e14] shadow-2xl/40 p-5 bg-felt-light bg-[radial-gradient(circle,_transparent_40%,_rgba(0,0,0,0.3)_100%)]">
+        <main>
+          {screen === "main-menu" && <MainMenu onClickPlayButtons={onClickPlayButtons} />}
+          {screen === "game" && <Game count={tiles} onExitButtonClick={onExitButtonClick} />}
+        </main>
+      </div>
     </div>
   )
 }

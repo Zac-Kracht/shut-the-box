@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+    --background-image-wood: url('/wood-pattern2.png');
+
+    --color-felt-green: #35654d;
+    --color-felt-dark: #2a523e;
+    --color-felt-light: #2e8b57;
+    --color-felt-sage: #4a7c59;
+    --color-felt-bright: #3d9970;
+    --color-wood-frame: #5d4037;
+
+    --font-pub: "Times New Roman", Times, serif;
+}
