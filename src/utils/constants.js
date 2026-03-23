@@ -12,3 +12,5 @@ export const DICE_TO_COMP_MAP = {
     5: faDiceFive,
     6: faDiceSix,
 };
+
+export const BUTTON_STYLE_CLASS = "text-white bg-amber-400 box-border border border-transparent hover:bg-amber-600 shadow-xs font-medium leading-5 rounded-full text-sm px-4 py-2.5 w-50 h-15";
