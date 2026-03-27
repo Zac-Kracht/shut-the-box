@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import MainMenu from './components/MainMenu'
 import Game from './components/Game'
+import Instructions from './components/Instructions';
 
 function App() {
 
-  const [screen, setScreen] = useState("main-menu")
-  const [tiles, setTiles] = useState(9)
+  const [ screen, setScreen ] = useState("main-menu");
+  const [ showHelp, setShowHelp ] = useState(false);
+  const [ tiles, setTiles ] = useState(9);
 
   function onClickPlayButtons(event) {
     setScreen("game");
@@ -20,12 +22,29 @@ function App() {
   }
 
   function onExitButtonClick() {
-    setScreen("main-menu")
+    setScreen("main-menu");
+  }
+
+  function onHelpButtonClick() {
+    setShowHelp(true);
+  }
+
+  function onHelpExit() {
+    setShowHelp(false);
   }
 
   return (
     <div className="flex min-h-screen w-full bg-wood p-10 pb-20">
       <div className="flex-1 rounded-2xl overflow-hidden border-5 border-[#2d1e14] shadow-2xl/40 p-5 bg-felt-light bg-[radial-gradient(circle,_transparent_40%,_rgba(0,0,0,0.3)_100%)]">
+        <div className="flex justify-end">
+          <button
+            onClick={onHelpButtonClick}
+            className="flex items-center justify-center w-10 h-10 border-2 border-gray-900 rounded-full text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
+          >
+            <span className="text-xl font-bold">?</span>
+          </button>
+        </div>
+        {showHelp && <Instructions onExit={onHelpExit} />}
         <main>
           {screen === "main-menu" && <MainMenu onClickPlayButtons={onClickPlayButtons} />}
           {screen === "game" && <Game count={tiles} onExitButtonClick={onExitButtonClick} />}

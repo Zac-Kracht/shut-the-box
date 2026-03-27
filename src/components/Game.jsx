@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Title from './Title.jsx'
 import TileArray from './TileArray.jsx'
+import GameOver from './GameOver.jsx'
+
 import * as GameUtils from '../utils/utils.js'
 import * as GameConstants from '../utils/constants.js'
 
@@ -13,79 +15,65 @@ function Game({count, onExitButtonClick}) {
     const [ diceRoll, setDiceRoll ] = useState([1, 1]);
     const [ gameState, setGameState ] = useState("init");
     const [ showTotal, setShowTotal ] = useState(false);
+    const [ showGameOver, setShowGameOver ] = useState(false);
     const [ tileEnabled, setTileEnabled ] = useState(Array(count).fill(true));
 
     const buttonClass = "w-32 border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700";
 
     // Event handlers
-    function onRollClick(event) {
-        const buttonName = event.currentTarget.name;
-
-        let rolls = 0;
-        const interval = setInterval(() => {
-            const dice1 = Math.floor(Math.random() * 6) + 1;
-            const dice2 = Math.floor(Math.random() * 6) + 1;
-
-            const nextDiceRoll = buttonName == "rollTwo" ? [dice1, dice2] : [dice1]
-            setDiceRoll(nextDiceRoll);
-
-            rolls++;
-            if (rolls >= GameConstants.NUM_ROLLS_PER_ANIMATION) {
-                clearInterval(interval);
-                setShowTotal(true);
-                setGameState(GameUtils.isPlayPossible(tileEnabled, nextDiceRoll) ? "play" : "game-over");
-            }
-        }, GameConstants.ROLL_ANIMATON_DELAY);
-    }
-
     function onSubmit(formData) {
-        if (gameState === "init") {
-            performRoll(formData);
-            setGameState("play");
-        } else if (gameState === "play") {
-            if (performTileValidation(formData)) {
-                performRoll(formData);
-            }
-        }
-    }
-
-    function performRoll(formData) {
+        let nextTileEnabled = tileEnabled;
         const buttonName = formData.get("roll");
 
-        let rolls = 0;
-        const interval = setInterval(() => {
-            const dice1 = Math.floor(Math.random() * 6) + 1;
-            const dice2 = Math.floor(Math.random() * 6) + 1;
+        if (buttonName == "playAgain") {
+            setGameState("init");
+            setTileEnabled(Array(count).fill(true))
+            return;
+        }
 
-            const nextDiceRoll = buttonName == "rollTwo" ? [dice1, dice2] : [dice1]
-            setDiceRoll(nextDiceRoll);
+        if (gameState != "init") {
+            const checkedTiles = formData.getAll("tile");
 
-            rolls++;
-            if (rolls >= GameConstants.NUM_ROLLS_PER_ANIMATION) {
-                clearInterval(interval);
-                setShowTotal(true);
-                if (!GameUtils.isPlayPossible(tileEnabled, nextDiceRoll)) {
-                    setGameState("game-over");
-                }
+            if (!GameUtils.isSumValid(checkedTiles, diceRoll)) {
+                return;
             }
-        }, GameConstants.ROLL_ANIMATON_DELAY);
-    }
 
-    function performTileValidation(formData) {
-        const checkedTiles = formData.getAll("tile");
-
-        if (GameUtils.isSumValid(checkedTiles, diceRoll)) {
-            const nextTileEnabled = tileEnabled.map((enabled, i) => {
+            nextTileEnabled = tileEnabled.map((enabled, i) => {
                 return checkedTiles.includes((i+1).toString()) ? false : enabled;
             });
             setTileEnabled(nextTileEnabled);
-            setShowTotal(false);
             if (GameUtils.allTilesDown(nextTileEnabled)) {
                 setGameState("game-over");
-                return false;
+                setShowGameOver(true);
+                return;
             }
-        } 
-        return true;
+        }
+
+        let rolls = 0;
+        const interval = setInterval(() => {
+            const dice1 = Math.floor(Math.random() * 6) + 1;
+            const dice2 = Math.floor(Math.random() * 6) + 1;
+
+            const nextDiceRoll = buttonName == "rollTwo" ? [dice1, dice2] : [dice1]
+            setDiceRoll(nextDiceRoll);
+
+            rolls++;
+            if (rolls >= GameConstants.NUM_ROLLS_PER_ANIMATION) {
+                clearInterval(interval);
+                setShowTotal(true);
+                if (!GameUtils.isPlayPossible(nextTileEnabled, nextDiceRoll)) {
+                    setGameState("game-over");
+                    setShowGameOver(true);
+                    return;
+                }
+            }
+        }, GameConstants.ROLL_ANIMATON_DELAY);
+
+        setGameState("play");
+    }
+
+    function onGameOverExit() {
+        setShowGameOver(false);
     }
 
     // Final component
@@ -105,27 +93,30 @@ function Game({count, onExitButtonClick}) {
                 {showTotal && <p className="text-center">Total: {GameUtils.sumDiceRoll(diceRoll)}</p>}
 
                 <div className="flex flex-row justify-center m-6">
-                    {GameUtils.isOneDiceRollAvail(tileEnabled) &&
+                    {gameState != "game-over" && GameUtils.isOneDiceRollAvail(tileEnabled) &&
                         <button type="submit" name="roll" value="rollOne" className={GameConstants.BUTTON_STYLE_CLASS}>
                             Roll 1 die
                         </button>
-
                     }
-                    <button type="submit" name="roll" value="rollTwo" className={GameConstants.BUTTON_STYLE_CLASS}>
-                        Roll 2 dice
-                    </button>
+                    {gameState != "game-over" &&
+                        <button type="submit" name="roll" value="rollTwo" className={GameConstants.BUTTON_STYLE_CLASS}>
+                            Roll 2 dice
+                        </button>
+                    } 
+                    {gameState == "game-over" &&
+                        <button type="submit" name="roll" value="playAgain" className={GameConstants.BUTTON_STYLE_CLASS}>
+                            Play Again?
+                        </button>
+                    }
                 </div>
             </form>
 
 
             
-            <button className={buttonClass}>
-                Help
-            </button>
             <button className={buttonClass} onClick={onExitButtonClick}>
                 Exit
             </button>
-            {gameState === "game-over" && <p className="text-red-600">Game Over!</p>}
+            {showGameOver && <GameOver onExit={onGameOverExit} score={GameUtils.getFinalScore(tileEnabled)} />}
         </div>
     )
 }

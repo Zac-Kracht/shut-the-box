@@ -32,3 +32,7 @@ export const isOneDiceRollAvail = (tileArr) => {
 export const sumDiceRoll = (diceArr) => {
     return diceArr.reduce((sum, val) => sum + val, 0);
 };
+
+export const getFinalScore = (tiles) => {
+    return tiles.reduce((sum, val, i) => sum + (val ? i + 1 : 0), 0);
+};
