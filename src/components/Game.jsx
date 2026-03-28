@@ -9,7 +9,7 @@ import * as GameUtils from '../utils/utils.js'
 import * as GameConstants from '../utils/constants.js'
 
 
-function Game({count, onExitButtonClick}) {
+function Game({count}) {
 
     // State
     const [ diceRoll, setDiceRoll ] = useState([1, 1]);
@@ -43,8 +43,7 @@ function Game({count, onExitButtonClick}) {
             });
             setTileEnabled(nextTileEnabled);
             if (GameUtils.allTilesDown(nextTileEnabled)) {
-                setGameState("game-over");
-                setShowGameOver(true);
+                gameOverEffect();
                 return;
             }
         }
@@ -62,8 +61,7 @@ function Game({count, onExitButtonClick}) {
                 clearInterval(interval);
                 setShowTotal(true);
                 if (!GameUtils.isPlayPossible(nextTileEnabled, nextDiceRoll)) {
-                    setGameState("game-over");
-                    setShowGameOver(true);
+                    gameOverEffect();
                     return;
                 }
             }
@@ -74,6 +72,13 @@ function Game({count, onExitButtonClick}) {
 
     function onGameOverExit() {
         setShowGameOver(false);
+    }
+
+    function gameOverEffect() {
+        setTimeout(() => {
+            setGameState("game-over");
+            setShowGameOver(true);
+        }, GameConstants.GAME_OVER_DELAY);   
     }
 
     // Final component
@@ -110,12 +115,6 @@ function Game({count, onExitButtonClick}) {
                     }
                 </div>
             </form>
-
-
-            
-            <button className={buttonClass} onClick={onExitButtonClick}>
-                Exit
-            </button>
             {showGameOver && <GameOver onExit={onGameOverExit} score={GameUtils.getFinalScore(tileEnabled)} />}
         </div>
     )
