@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import Dice from './Dice.jsx';
 import Title from './Title.jsx'
 import TileArray from './TileArray.jsx'
 import GameOver from './GameOver.jsx'
@@ -13,12 +13,19 @@ function Game({count}) {
 
     // State
     const [ diceRoll, setDiceRoll ] = useState([1, 1]);
-    const [ gameState, setGameState ] = useState("init");
-    const [ showTotal, setShowTotal ] = useState(false);
+    const [ gameState, setGameState ] = useState("init"); // possible states: init, play, rolling, invalid-sum, game-over
     const [ showGameOver, setShowGameOver ] = useState(false);
     const [ tileEnabled, setTileEnabled ] = useState(Array(count).fill(true));
 
-    const buttonClass = "w-32 border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700";
+    const DICE_STYLE_CLASS = "w-10 h-10 text-black fill-white"
+    const DICE_COMPONENT_MAP = {
+        1: <Dice side={1} />,
+        2: <Dice side={2} />,
+        3: <Dice side={3} />,
+        4: <Dice side={4} />,
+        5: <Dice side={5} />,
+        6: <Dice side={6} />,
+    };
 
     // Event handlers
     function onSubmit(formData) {
@@ -35,6 +42,10 @@ function Game({count}) {
             const checkedTiles = formData.getAll("tile");
 
             if (!GameUtils.isSumValid(checkedTiles, diceRoll)) {
+                setGameState("invalid-sum");
+                setTimeout(() => {
+                    setGameState("play");
+                }, GameConstants.INVALID_SUM_DELAY);
                 return;
             }
 
@@ -47,6 +58,7 @@ function Game({count}) {
                 return;
             }
         }
+        setGameState("rolling");
 
         let rolls = 0;
         const interval = setInterval(() => {
@@ -59,15 +71,14 @@ function Game({count}) {
             rolls++;
             if (rolls >= GameConstants.NUM_ROLLS_PER_ANIMATION) {
                 clearInterval(interval);
-                setShowTotal(true);
                 if (!GameUtils.isPlayPossible(nextTileEnabled, nextDiceRoll)) {
                     gameOverEffect();
                     return;
                 }
+                setGameState("play");
             }
         }, GameConstants.ROLL_ANIMATON_DELAY);
 
-        setGameState("play");
     }
 
     function onGameOverExit() {
@@ -81,6 +92,21 @@ function Game({count}) {
         }, GameConstants.GAME_OVER_DELAY);   
     }
 
+    function helperText() {
+        switch(gameState) {
+            case "init":
+                return "Total: ";
+            case "play":
+                return "Total: " + GameUtils.sumDiceRoll(diceRoll);
+            case "rolling":
+                return "Rolling...";
+            case "game-over":
+                return "Game Over";
+            case "invalid-sum":
+                return "Invalid Sum";
+        }
+    }
+
     // Final component
     return (
         <div className="flex flex-col justify-center">
@@ -90,12 +116,16 @@ function Game({count}) {
             <form action={onSubmit} >
                 <TileArray count={count} tileEnabled={tileEnabled} />
 
-                <div className="flex flex-row justify-center m-6">
-                    <FontAwesomeIcon icon={GameConstants.DICE_TO_COMP_MAP[diceRoll[0]]} size="2xl" style={{color: "#ffffff"}} />
-                    {diceRoll.length == 2 && <FontAwesomeIcon icon={GameConstants.DICE_TO_COMP_MAP[diceRoll[1]]} size="2xl" style={{color: "#ffffff"}} />}
+                <div className="flex justify-center">
+                    <p className={`px-4 py-2 w-30 text-center rounded-md text-sm font-medium shadow-lg ${gameState === "invalid-sum" ? "bg-red-700 text-white" : "bg-white text-black"}`}>
+                        {helperText()}
+                    </p>
                 </div>
 
-                {showTotal && <p className="text-center">Total: {GameUtils.sumDiceRoll(diceRoll)}</p>}
+                <div className="flex flex-row justify-center m-4 gap-2">
+                    {DICE_COMPONENT_MAP[diceRoll[0]]}
+                    {diceRoll.length == 2 && DICE_COMPONENT_MAP[diceRoll[1]]}
+                </div>
 
                 <div className="flex flex-row justify-center m-6">
                     {gameState != "game-over" && GameUtils.isOneDiceRollAvail(tileEnabled) &&

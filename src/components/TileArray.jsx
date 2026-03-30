@@ -1,4 +1,5 @@
 function TileArray({count, tileEnabled}) {  
+    let showOverlay = true;
 
     let checkBoxes = []
     for (let i = 1; i <= count; i++) {
@@ -20,9 +21,9 @@ function TileArray({count, tileEnabled}) {
     }
 
     return (
-      <div className="flex flex-wrap gap-0 p-8 justify-center">
-        {checkBoxes}
-      </div>
+        <div className="flex flex-wrap gap-0 p-8 justify-center">
+            {checkBoxes}
+        </div>
     )
 }
   
