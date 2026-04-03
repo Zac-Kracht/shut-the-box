@@ -1,11 +1,11 @@
-function TileArray({count, tileEnabled}) {  
+function TileArray({count, gameState, tileEnabled, tileSelected, onChange}) {  
     let showOverlay = true;
 
     let checkBoxes = []
     for (let i = 1; i <= count; i++) {
         checkBoxes.push(
             <label key={i.toString()} className="relative cursor-pointer">
-                <input type="checkbox" name="tile" value={i} disabled={!tileEnabled[i-1]} className="peer sr-only" />
+                <input type="checkbox" name="tile" value={i} checked={tileSelected[i-1]} disabled={!tileEnabled[i-1] || gameState == "init"} onChange={onChange} className="peer sr-only" />
                 <div className="
                     flex items-center justify-center
                     w-18 h-30 rounded-md border-2 transition-all

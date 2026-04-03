@@ -1,6 +1,6 @@
-export const isSumValid = (checkedTiles, diceRoll) => {
-    const sumCheckedTiles = checkedTiles.reduce(
-        (sum, val) => sum + parseInt(val, 10)
+export const isSumValid = (tileSelected, diceRoll) => {
+    const sumCheckedTiles = tileSelected.reduce(
+        (sum, val, i) => sum + (val ? i+1 : 0)
     , 0);
     const sumDiceRoll = diceRoll.reduce((sum, val) => sum + val, 0);
     return sumCheckedTiles === sumDiceRoll ? true : false;
@@ -25,8 +25,8 @@ export const isGameOver = (tileArr, diceArr) => {
     return !(!allTilesDown(tileArr) && isPlayPossible(tileArr, diceArr));
 };
 
-export const isOneDiceRollAvail = (tileArr) => {
-    return allTilesDown(tileArr.slice(6));
+export const isOneDiceRollAvail = (tileEnabledArr, tileSelectedArr) => {
+    return tileEnabledArr.reduce((sum, val, i) => i >= 6 ? (sum && (!val || tileSelectedArr[i])) : sum, true);
 };
 
 export const sumDiceRoll = (diceArr) => {
