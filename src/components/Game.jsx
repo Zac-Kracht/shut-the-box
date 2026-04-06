@@ -123,37 +123,42 @@ function Game({count}) {
 
     // Final component
     return (
-        <div className="flex flex-col justify-center">
-            <div className="text-center m-6">
-                <Title textSize="text-6xl" />
+        <div className="flex flex-col justify-center h-full">
+            <div className="text-center mt-2 mb-4">
+                <Title textSize="text-5xl md:text-6xl" />
             </div>
-            <form action={onSubmit} >
+            
+            <form action={onSubmit} className="flex flex-col flex-1">
+                
+                {/* The Tiles */}
                 <TileArray count={count} tileEnabled={tileEnabled} tileSelected={tileSelected} onChange={onTileChange} gameState={gameState}/>
 
-                <div className="flex justify-center">
-                    <p className={"px-4 py-2 w-30 text-center rounded-md text-sm font-medium shadow-lg cursor-default bg-white text-black"}
-                    >
+                {/* Status Indicator / Screen Reader Live Region */}
+                <div className="flex justify-center mt-auto mb-6" aria-live="polite" aria-atomic="true">
+                    <p className="px-6 py-2 min-w-35 text-center rounded-sm text-sm font-bold tracking-widest uppercase shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] bg-emerald-950 text-emerald-300 border border-emerald-700">
                         {helperText()}
                     </p>
                 </div>
 
-                <div className="flex flex-row justify-center m-4 gap-2">
+                {/* Dice Area */}
+                <div className="flex flex-row justify-center mb-8 gap-4 min-h-16">
                     {DICE_COMPONENT_MAP[diceRoll[0]]}
-                    {diceRoll.length == 2 && DICE_COMPONENT_MAP[diceRoll[1]]}
+                    {diceRoll.length === 2 && DICE_COMPONENT_MAP[diceRoll[1]]}
                 </div>
 
-                <div className="flex flex-row justify-center m-6 gap-4">
-                    {gameState != "game-over" &&
-                        <button type="submit" name="roll" value="rollTwo" className={GameConstants.BUTTON_STYLE_CLASS} disabled={gameState == "rolling" || (gameState == "play" && !GameUtils.isSumValid(tileSelected, diceRoll))}>
-                            Roll 2 dice
+                {/* Controls */}
+                <div className="flex flex-row justify-center mb-4 gap-4 px-4">
+                    {gameState !== "game-over" &&
+                        <button type="submit" name="roll" value="rollTwo" className={GameConstants.BUTTON_STYLE_CLASS} disabled={gameState === "rolling" || (gameState === "play" && !GameUtils.isSumValid(tileSelected, diceRoll))}>
+                            Roll 2 Dice
                         </button>
                     } 
-                    {gameState != "game-over" &&
-                        <button type="submit" name="roll" value="rollOne" className={GameConstants.BUTTON_STYLE_CLASS} disabled={gameState != "play" || (!GameUtils.isOneDiceRollAvail(tileEnabled, tileSelected) || !GameUtils.isSumValid(tileSelected, diceRoll))}>
-                            Roll 1 die
+                    {gameState !== "game-over" &&
+                        <button type="submit" name="roll" value="rollOne" className={GameConstants.BUTTON_STYLE_CLASS} disabled={gameState !== "play" || (!GameUtils.isOneDiceRollAvail(tileEnabled, tileSelected) || !GameUtils.isSumValid(tileSelected, diceRoll))}>
+                            Roll 1 Die
                         </button>
                     }
-                    {gameState == "game-over" &&
+                    {gameState === "game-over" &&
                         <button type="submit" name="roll" value="playAgain" className={GameConstants.BUTTON_STYLE_CLASS}>
                             Play Again?
                         </button>

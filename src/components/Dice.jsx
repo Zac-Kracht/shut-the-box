@@ -23,11 +23,11 @@ function Dice({side = 1, borderThickness = 1.2, dotRadius = 1.5}) {
     const dots = dotMapping[side] || dotMapping[1];
   
     return (
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-16 h-16 text-black">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-16 h-16 text-black drop-shadow-lg">
         {/* The Dice Box */}
         <rect 
           x="3" y="3" width="18" height="18" rx="2" ry="2" 
-          fill="white" 
+          fill="#fffff0" 
           stroke="currentColor" 
           strokeWidth={borderThickness} 
         />

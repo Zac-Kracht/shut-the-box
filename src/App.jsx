@@ -4,6 +4,7 @@ import { FaLongArrowAltLeft } from "react-icons/fa";
 import MainMenu from './components/MainMenu'
 import Game from './components/Game'
 import Instructions from './components/Instructions';
+import NavBar from './components/NavBar';
 
 function App() {
 
@@ -36,29 +37,21 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-wood p-10 pb-20">
-      <div className="flex-1 rounded-2xl overflow-hidden border-5 border-[#2d1e14] shadow-2xl/40 p-5 bg-felt-light bg-[radial-gradient(circle,_transparent_40%,_rgba(0,0,0,0.3)_100%)]">
-        <div className="flex flex-row justify-between">
-          {screen == "game" &&
-            <button
-              onClick={onBackButtonClick}
-              className="flex items-center justify-center w-10 h-10 border-2 border-gray-900 rounded-full text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
-            >
-              <FaLongArrowAltLeft />
-            </button>
-          }
-          <button
-            onClick={onHelpButtonClick}
-            className="ml-auto flex items-center justify-center w-10 h-10 border-2 border-gray-900 rounded-full text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
-          >
-            <span className="text-xl font-bold">?</span>
-          </button>
-        </div>
+    // The "Tavern Table" background
+    <div className="flex min-h-screen w-full bg-stone-700 p-4 md:p-10 pb-20 items-center justify-center">
+      
+      {/* The "Shut the Box" Game Board */}
+      <div className="relative w-full max-w-6xl min-h-[80vh] flex flex-col rounded-xl border-16 border-amber-900 bg-emerald-800 shadow-[inset_0_0_40px_rgba(0,0,0,0.8),0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden ring-4 ring-amber-950">
+        
+        <NavBar showBackButton={screen} onBackButtonClick={onBackButtonClick} onHelpButtonClick={onHelpButtonClick} />
+
         {showHelp && <Instructions onExit={onHelpExit} />}
-        <main>
+        
+        <main className="flex-1 flex flex-col justify-center pb-8 z-0">
           {screen === "main-menu" && <MainMenu onClickPlayButtons={onClickPlayButtons} />}
           {screen === "game" && <Game count={tiles} />}
         </main>
+
       </div>
     </div>
   )
