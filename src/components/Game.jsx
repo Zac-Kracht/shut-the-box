@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useEffect } from 'react';
 
 import Dice from './Dice.jsx';
 import Title from './Title.jsx'
@@ -17,8 +18,6 @@ function Game({count}) {
     const [ showGameOver, setShowGameOver ] = useState(false);
     const [ tileEnabled, setTileEnabled ] = useState(Array(count).fill(true));
     const [ tileSelected, setTileSelected ] = useState(Array(count).fill(false));
-
-    console.log(tileSelected);
 
     const DICE_COMPONENT_MAP = {
         1: <Dice side={1} />,
@@ -44,14 +43,6 @@ function Game({count}) {
 
         if (gameState != "init") {
             const checkedTiles = formData.getAll("tile");
-
-            // if (!GameUtils.isSumValid(checkedTiles, diceRoll)) {
-            //     setGameState("invalid-sum");
-            //     setTimeout(() => {
-            //         setGameState("play");
-            //     }, GameConstants.INVALID_SUM_DELAY);
-            //     return;
-            // }
 
             nextTileEnabled = tileEnabled.map((enabled, i) => {
                 return checkedTiles.includes((i+1).toString()) ? false : enabled;
@@ -114,6 +105,21 @@ function Game({count}) {
                 return "Game Over";
         }
     }
+
+    // Keystroke listener
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            const key = parseInt(event.key, 10);
+            if (key >= 1 && key <= 9) {
+                setTileSelected(prevTileSelected => prevTileSelected.map((prev_val, i) => i == key-1 ? !prev_val : prev_val));
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup to prevent memory leaks
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     // Final component
     return (
