@@ -1,19 +1,18 @@
 import Title from "./Title"
-import * as GameConstants from '../utils/constants.js'
 
 function MainMenu({onClickPlayButtons}) {
 
     return (
-        <div className="flex flex-col justify-center items-center h-full">
-            <div className="text-center mb-16">
-                <Title textSize="text-6xl md:text-8xl text-center" />
+        <div className="menu-container-main">
+            <div className="title-container title-container-menu">
+                <Title textSize="title-size-menu" />
             </div>
 
-            <div className="flex flex-col w-full max-w-xs gap-6">
-                <button className={GameConstants.BUTTON_STYLE_CLASS} name="play9" onClick={onClickPlayButtons}>
+            <div className="menu-container-btns">
+                <button className="game-btn focus-visible:ring-4 focus-visible:ring-amber-400" name="play9" onClick={onClickPlayButtons}>
                     Play 9 Tiles
                 </button>
-                <button className={GameConstants.BUTTON_STYLE_CLASS} name="play12" onClick={onClickPlayButtons}>
+                <button className="game-btn focus-visible:ring-4 focus-visible:ring-amber-400" name="play12" onClick={onClickPlayButtons}>
                     Play 12 Tiles
                 </button>
             </div>

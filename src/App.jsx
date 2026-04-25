@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { FaLongArrowAltLeft } from "react-icons/fa";
 
 import MainMenu from './components/MainMenu'
 import Game from './components/Game'
@@ -37,17 +36,14 @@ function App() {
   }
 
   return (
-    // The "Tavern Table" background
-    <div className="flex min-h-screen w-full bg-stone-700 p-4 md:p-10 pb-20 items-center justify-center">
-      
-      {/* The "Shut the Box" Game Board */}
-      <div className="relative w-full max-w-6xl min-h-[80vh] flex flex-col rounded-xl border-16 border-amber-900 bg-emerald-800 shadow-[inset_0_0_40px_rgba(0,0,0,0.8),0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden ring-4 ring-amber-950">
+    <div className="game-board-behind-container">
+      <div className="game-box-container">
         
         <NavBar showBackButton={screen} onBackButtonClick={onBackButtonClick} onHelpButtonClick={onHelpButtonClick} />
 
         {showHelp && <Instructions onExit={onHelpExit} />}
         
-        <main className="flex-1 flex flex-col justify-center pb-8 z-0">
+        <main className="main-game-container">
           {screen === "main-menu" && <MainMenu onClickPlayButtons={onClickPlayButtons} />}
           {screen === "game" && <Game count={tiles} />}
         </main>

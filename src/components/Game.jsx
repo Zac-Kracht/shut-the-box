@@ -124,8 +124,8 @@ function Game({count}) {
     // Final component
     return (
         <div className="flex flex-col justify-center h-full">
-            <div className="text-center mt-2 mb-4">
-                <Title textSize="text-5xl md:text-6xl" />
+            <div className="title-container title-container-game">
+                <Title textSize="title-size-game" />
             </div>
             
             <form action={onSubmit} className="flex flex-col flex-1">
@@ -149,17 +149,17 @@ function Game({count}) {
                 {/* Controls */}
                 <div className="flex flex-row justify-center mb-4 gap-4 px-4">
                     {gameState !== "game-over" &&
-                        <button type="submit" name="roll" value="rollTwo" className={GameConstants.BUTTON_STYLE_CLASS} disabled={gameState === "rolling" || (gameState === "play" && !GameUtils.isSumValid(tileSelected, diceRoll))}>
+                        <button type="submit" name="roll" value="rollTwo" className="game-btn focus-visible:ring-4 focus-visible:ring-amber-400" disabled={gameState === "rolling" || (gameState === "play" && !GameUtils.isSumValid(tileSelected, diceRoll))}>
                             Roll 2 Dice
                         </button>
                     } 
                     {gameState !== "game-over" &&
-                        <button type="submit" name="roll" value="rollOne" className={GameConstants.BUTTON_STYLE_CLASS} disabled={gameState !== "play" || (!GameUtils.isOneDiceRollAvail(tileEnabled, tileSelected) || !GameUtils.isSumValid(tileSelected, diceRoll))}>
+                        <button type="submit" name="roll" value="rollOne" className="game-btn focus-visible:ring-4 focus-visible:ring-amber-400" disabled={gameState !== "play" || (!GameUtils.isOneDiceRollAvail(tileEnabled, tileSelected) || !GameUtils.isSumValid(tileSelected, diceRoll))}>
                             Roll 1 Die
                         </button>
                     }
                     {gameState === "game-over" &&
-                        <button type="submit" name="roll" value="playAgain" className={GameConstants.BUTTON_STYLE_CLASS}>
+                        <button type="submit" name="roll" value="playAgain" className="game-btn focus-visible:ring-4 focus-visible:ring-amber-400">
                             Play Again?
                         </button>
                     }

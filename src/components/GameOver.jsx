@@ -1,7 +1,7 @@
 function GameOver({onExit, score}) {
 
     const handleShare = async () => {
-        const shareText = `I just scored ${score} in Shut the Box!`;
+        const shareText = `I just scored ${score} in Shut the Box! Think you can beat it? Play now at www.temp.com`;
         
         if (navigator.share) {
             try {

@@ -1,14 +1,131 @@
 @import "tailwindcss";
 
-@theme {
-    --background-image-wood: url('/wood-pattern2.png');
+/* TODO: change for different screen sizes */
 
-    --color-felt-green: #35654d;
-    --color-felt-dark: #2a523e;
-    --color-felt-light: #2e8b57;
-    --color-felt-sage: #4a7c59;
-    --color-felt-bright: #3d9970;
-    --color-wood-frame: #5d4037;
+/* Main containers */
+.game-board-behind-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    background-color: #44403b;
+    padding: 16px;
+    padding-bottom: 80px;
+}
 
-    --font-pub: "Times New Roman", Times, serif;
+.game-box-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    max-width: 72rem;
+    min-height: 80vh;
+    background-color: #006045;
+    border: 16px solid #7b3306;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 
+        inset 0 0 40px rgba(0, 0, 0, 0.8), 
+        0 0 0 4px #461901, 
+        0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.main-game-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    padding-bottom: 32px;
+    z-index: 0;
+}
+
+/* Title */
+.title-text {
+    font-family: "Times New Roman", Times, serif;
+    color: #f1d5a7;
+    filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.8));
+    user-select: none;
+    letter-spacing: 4px;
+}
+
+.title-size-game {
+    font-size: 3.75rem;
+}
+
+.title-size-menu {
+    font-size: 6rem;
+}
+
+.title-container {
+    text-align: center;
+}
+
+.title-container-menu {
+    margin-bottom: 16px;
+}
+
+.title-container-game {
+    margin-top: 2px;
+    margin-bottom: 4px;
+}
+
+/* Main Menu */
+.menu-container-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.menu-container-btns {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 20rem;
+    gap: 1.5rem;
+}
+
+/* Buttons */
+.game-btn {
+    color: #461901;
+    background-color: #f1d5a7;
+    padding: 1.5rem;
+    padding-block: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    border-radius: 4px;
+    border-bottom-width: 4px;
+    border-color: #cfa56a;
+}
+
+.game-btn:hover {
+    background-color: #ffffff;
+}
+
+.game-btn:active {
+    border-bottom-width: 0px;
+    translate: 0 4px;
+}
+
+.game-btn:disabled {
+    opacity: 50%;
+}
+
+.game-btn:disabled:active {
+    border-bottom-width: 4px;
+    translate: 0 0;
+}
+
+.game-btn:focus {
+    outline-style: none;
+}
+
+/* Dice */
+.dice {
+    width: 64px;
+    height: 64px;
+    color: #000000;
+    filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.15));
 }
